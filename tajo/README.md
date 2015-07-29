@@ -6,9 +6,9 @@ Currently Tajo is supported on EMR through a bootstrap action.
   * link: http://docs.aws.amazon.com/cli/latest/userguide/installing.html
 
 * s3 path
-  * script: s3://beta.elasticmapreduce/bootstrap-actions/tajo/install-tajo.sh
-    * direct link : https://s3.amazonaws.com/beta.elasticmapreduce/bootstrap-actions/tajo/install-tajo.sh
-  * template: s3://beta.elasticmapreduce/bootstrap-actions/tajo/template/tajo-0.10.0
+  * script: s3://tajo-emr/install-tajo.sh
+    * direct link : https://s3.amazonaws.com/tajo-emr/install-tajo.sh
+  * template: s3://tajo-emr/template/tajo-0.10.0
    
 Bootstrap Action Arguments:
 ==========================
@@ -21,7 +21,7 @@ Usage: install-tajo.sh [-t|--tar] [-c|--conf] [-l|--lib] [-h|--help] [-e|--env] 
        Ex: s3://[your_bucket]/[your_path]/tajo-0.10.0.tar.gz or http://apache.mirror.cdnetworks.com/tajo/tajo-0.10.0/tajo-0.10.0.tar.gz
     -c, --conf [S3_PATH_TO_TAJO_CONF_DIR] 
        Tajo conf directory URL.
-       Ex: --conf s3://beta.elasticmapreduce/bootstrap-actions/tajo/template/tajo-0.10.0/c3.xlarge/conf
+       Ex: --conf s3://tajo-emr/template/tajo-0.10.0/c3.xlarge/conf
     -l. --lib [S3_PATH_TO_THIRD_PARTY_JARS_DIR]
        Tajo third party lib URL.
        Ex: --lib s3://{your_bucket}/{your_lib_dir} or http://{lib_url}/{lib_file_name.jar}
@@ -60,11 +60,12 @@ Launching a Tajo cluster with a default configurations
 ```
 $ aws emr create-cluster    \
 	--name="[CLUSTER_NAME]"  \
-	--ami-version=3.3        \
+	--ami-version=3.8        \
 	--no-auto-terminate	\
+	--use-default-roles \
 	--ec2-attributes KeyName=[KEY_PAIR_NAME] \
 	--instance-groups InstanceGroupType=MASTER,InstanceCount=1,InstanceType=m3.xlarge InstanceGroupType=CORE,InstanceCount=1,InstanceType=c3.xlarge \
-	--bootstrap-action Name="Install tajo",Path=s3://beta.elasticmapreduce/bootstrap-actions/tajo/install-tajo.sh
+	--bootstrap-action Name="Install tajo",Path=s3://tajo-emr/install-tajo.sh
 ```
 
 Launching a Tajo cluster with additional configurations
@@ -79,11 +80,12 @@ Launching a Tajo cluster with additional configurations
 ```
     aws emr create-cluster \
     --name="[CLUSTER_NAME]" \
-    --ami-version=3.3 \
+    --ami-version=3.8 \
     --no-auto-terminate	\
+    --use-default-roles \
     --ec2-attributes KeyName=[KEY_PAIR_NAME] \
     --instance-groups InstanceGroupType=MASTER,InstanceCount=1,InstanceType=m3.xlarge InstanceGroupType=CORE,InstanceCount=1,InstanceType=c3.xlarge \
-    --bootstrap-action Name="Install tajo",Path=s3://beta.elasticmapreduce/bootstrap-actions/tajo/install-tajo.sh,Args=["-t","s3://[your_bucket]/tajo-0.10.0.tar.gz","-c","s3://[your_bucket]/conf","-l","s3://[your_bucket]/lib"]
+    --bootstrap-action Name="Install tajo",Path=s3://tajo-emr/install-tajo.sh,Args=["-t","s3://[your_bucket]/tajo-0.10.0.tar.gz","-c","s3://[your_bucket]/conf","-l","s3://[your_bucket]/lib"]
 ```
 
 Terminating a Tajo cluster
@@ -124,10 +126,11 @@ Tajo can use RDS. For it:
 ```
     aws emr create-cluster \
     --name="[CLUSTER_NAME]" \
-    --ami-version=3.3 \
+    --ami-version=3.8 \
+    --use-default-roles \
     --ec2-attributes KeyName=[KEY_PAIR_NAME] \
     --instance-groups InstanceGroupType=MASTER,InstanceCount=1,InstanceType=m3.xlarge InstanceGroupType=CORE,InstanceCount=1,InstanceType=c3.xlarge \
-    --bootstrap-action Name="Install tajo",Path=s3://beta.elasticmapreduce/bootstrap-actions/tajo/install-tajo.sh,Args=["-t","s3://[your_bucket]/tajo-0.10.0.tar.gz","-c","s3://[your_bucket]/conf","-l", \
+    --bootstrap-action Name="Install tajo",Path=s3://tajo-emr/install-tajo.sh,Args=["-t","s3://[your_bucket]/tajo-0.10.0.tar.gz","-c","s3://[your_bucket]/conf","-l", \
     "http://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.28/mysql-connector-java-5.1.28.jar", \
     "-s","tajo.catalog.store.class=org.apache.tajo.catalog.store.MySQLStore tajo.catalog.jdbc.connection.id={id} tajo.catalog.jdbc.connection.password={password} tajo.catalog.jdbc.uri=jdbc:mysql://{RDS_URL}:3306/tajo?createDatabaseIfNotExist=true"]
 ```
